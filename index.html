@@ -54,7 +54,7 @@ const D=(v)=>v?pd(v):{y:'',m:'',d:'',w:''};
 const dark='#1a1a1a';
 // boxes: x,y,w,h = 覆盖区域（图片像素坐标）；align；size；text(values)
 const P={
- qfw:{name:'全方位课程',img:'assets/quanfangwei.png',
+ qfw:{name:'全方位课程',img:'assets/quanfangwei',
   fields:[{id:'day',label:'Day',type:'select',opts:['1','2','3','4'],def:'2'},
           {id:'date',label:'上课日期',type:'date',def:'2026-11-28'},
           {id:'topic',label:'主题',type:'text',def:'崩盘交易'}],
@@ -62,17 +62,17 @@ const P={
          {x:485,y:1183,w:490,h:78,ax:488,size:52,t:v=>v.topic}],
   copy:v=>{const fb=`@everyone 大家好，\n同学好，\n敬请留意，如果您还没有完成全方位课程的 DAY ${v.day} 课程，请检查一下您的电邮，行政已经发出注册上课的电邮。\n如果您想温故知新，欢迎报名重复上课。\n重复上课报名链接：https://forms.gle/bCEDVWDuVCa3Xp6B6\n\n请学员们在星期四之前安排时间，并完成上课注册，感谢您的配合。\n如需协助，请联系行政：019-501 6836\n祝您生活顺心，投资顺利。\n朝阳`;
     return {'Facebook 版':fb,'Telegram 版':fb.replace('@everyone 大家好，','大家好，')}}},
- yz:{name:'赢在起跑线',img:'assets/yingzai.png',
+ yz:{name:'赢在起跑线',img:'assets/yingzai',
   fields:[{id:'date',label:'日期',type:'date',def:'2026-09-13'},
           {id:'place',label:'地点',type:'text',def:'Taetea 大益茶馆'}],
   boxes:[{x:745,y:752,w:405,h:68,ax:750,size:46,t:v=>{const o=D(v.date);return `${o.m}月${o.d}日`}},
          {x:745,y:955,w:405,h:70,ax:748,size:46,t:v=>v.place}]},
- hg:{name:'宏观行业 Live 分析',img:'assets/hongguan.png',
+ hg:{name:'宏观行业 Live 分析',img:'assets/hongguan',
   fields:[{id:'date',label:'日期',type:'date',def:'2026-11-20'},
           {id:'time',label:'时间',type:'text',def:'8pm'}],
   boxes:[{x:445,y:818,w:385,h:76,cx:608,size:62,t:v=>{const o=D(v.date);return `${o.m}月${o.d}日`}},
          {x:445,y:948,w:385,h:76,cx:608,size:62,t:v=>v.time}]},
- tu:{name:'Tutorial 通知',img:'assets/tutorial.png',
+ tu:{name:'Tutorial 通知',img:'assets/tutorial',
   fields:[{id:'date',label:'日期',type:'date',def:'2026-12-01'},
           {id:'time',label:'海报时间',type:'text',def:'8pm'},
           {id:'ctime',label:'文案时间',type:'text',def:'08:00 PM - 9:00 PM'},
@@ -80,7 +80,7 @@ const P={
   boxes:[{x:455,y:693,w:340,h:72,cx:612,size:60,t:v=>{const o=D(v.date);return `${o.m}月${o.d}日`}},
          {x:455,y:813,w:340,h:72,cx:612,size:60,t:v=>v.time}],
   copy:v=>{const o=D(v.date);return {'文案':`诚邀出席生财有道~道资 Tutorial\n日期：${p2(o.d)}-${p2(o.m)}-${o.y}（周${o.w}）\n时间：${v.ctime}\n\n重要提醒\n‼️ 请点击以下链接完成 Zoom 注册，获取课程专属会议链接 ：\n👉 Zoom 注册链接：\n${v.zoom}\n\n⚠️ 注意：\n以上链接为 注册页面，非会议链接。\n注册完成后，Zoom 将通过邮箱发送会议链接，请注意查收 📧。\n\n祝您学习愉快，早日实现投资目标！🌟\n\n道资行政部`}}},
- kl:{name:'康乐活动',img:'assets/kangle.png',
+ kl:{name:'康乐活动',img:'assets/kangle',
   fields:[{id:'date',label:'日期',type:'date',def:'2026-12-06'},
           {id:'time',label:'时间',type:'text',def:'8.30am'},
           {id:'place',label:'地点',type:'text',def:'Bukit Kiara'},
@@ -112,7 +112,7 @@ function buildFields(){
   p.fields.forEach(f=>$('f_'+f.id).oninput=e=>{vals[f.id]=e.target.value;render()});
   render();
 }
-function loadImg(src){return new Promise(r=>{if(imgs[src])return r(imgs[src]);const i=new Image();i.onload=()=>{imgs[src]=i;r(i)};i.src=src})}
+function loadImg(base){return new Promise((res,rej)=>{if(imgs[base])return res(imgs[base]);const ex=['jpeg','jpg','png','JPEG','JPG','PNG'];let n=0;(function t(){if(n>=ex.length)return rej();const i=new Image();i.onload=()=>{imgs[base]=i;res(i)};i.onerror=t;i.src=base+'.'+ex[n++]})()})}
 
 async function render(){
   const p=P[cur],img=await loadImg(p.img);
