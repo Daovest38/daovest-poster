@@ -16,7 +16,7 @@ main{display:grid;grid-template-columns:340px 1fr;gap:16px;padding:16px;max-widt
 .card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:14px}
 label{display:block;font-size:13px;color:var(--mut);margin:10px 0 4px}
 input,select,textarea{width:100%;padding:8px;border:1px solid var(--bd);border-radius:6px;font:inherit;background:var(--bg);color:var(--tx)}
-textarea{height:210px;resize:vertical;font-size:14px}
+textarea{height:260px;resize:vertical;font-size:14px}
 button{padding:9px 14px;border:0;border-radius:6px;background:var(--ac);color:#fff;font:inherit;cursor:pointer;margin:8px 8px 0 0}
 button.alt{background:#555}
 .chk{display:flex;gap:6px;align-items:center;font-size:13px;margin-top:12px;color:var(--mut)}
@@ -41,8 +41,9 @@ canvas{width:100%;height:auto;border-radius:8px;border:1px solid var(--bd)}
     <div class="card"><canvas id="cv"></canvas></div>
     <div class="card" id="copyCard">
       <div class="tabs" id="tabs"></div>
-      <textarea id="copy" readonly></textarea>
-      <button id="cp">📋 复制文案</button><span id="ok" style="font-size:13px"></span>
+      <textarea id="copy"></textarea>
+      <div style="font-size:12px;color:var(--mut)">文案可直接修改。修改后若再改左边资料，文案会重新按模板生成。</div>
+      <button id="cp">📋 复制文案</button><button id="rs" class="alt">↺ 重置为模板</button><span id="ok" style="font-size:13px"></span>
     </div>
   </div>
 </main>
@@ -102,14 +103,14 @@ $('type').onchange=e=>{cur=e.target.value;buildFields()};
 $('clean').onchange=render;
 
 function buildFields(){
-  const p=P[cur];vals={};
+  const p=P[cur];vals={};edits={};
   $('fields').innerHTML=p.fields.map(f=>{
     vals[f.id]=f.def;
     const inp=f.type==='select'
       ?`<select id="f_${f.id}">${f.opts.map(o=>`<option ${o===f.def?'selected':''}>${o}</option>`).join('')}</select>`
       :`<input id="f_${f.id}" type="${f.type}" value="${f.def}">`;
     return `<label>${f.label}</label>${inp}`}).join('');
-  p.fields.forEach(f=>$('f_'+f.id).oninput=e=>{vals[f.id]=e.target.value;render()});
+  p.fields.forEach(f=>$('f_'+f.id).oninput=e=>{vals[f.id]=e.target.value;edits={};render()});
   render();
 }
 function loadImg(base){return new Promise((res,rej)=>{if(imgs[base])return res(imgs[base]);const ex=['jpeg','jpg','png','JPEG','JPG','PNG'];let n=0;(function t(){if(n>=ex.length)return rej();const i=new Image();i.onload=()=>{imgs[base]=i;res(i)};i.onerror=t;i.src=base+'.'+ex[n++]})()})}
@@ -135,7 +136,7 @@ async function render(){
   });
   renderCopy();
 }
-let copies={},tab='';
+let copies={},tab='',edits={};
 function renderCopy(){
   const p=P[cur];$('copyCard').style.display=p.copy?'':'none';
   if(!p.copy)return;
@@ -143,8 +144,10 @@ function renderCopy(){
   if(!copies[tab])tab=Object.keys(copies)[0];
   $('tabs').innerHTML=Object.keys(copies).map(k=>`<button class="${k===tab?'on':''}" data-k="${k}">${k}</button>`).join('');
   $('tabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{tab=b.dataset.k;renderCopy()});
-  $('copy').value=copies[tab];
+  $('copy').value=edits[tab]!==undefined?edits[tab]:copies[tab];
 }
+$('copy').oninput=()=>{edits[tab]=$('copy').value};
+$('rs').onclick=()=>{delete edits[tab];renderCopy()};
 $('cp').onclick=async()=>{
   try{await navigator.clipboard.writeText($('copy').value)}catch(e){$('copy').select();document.execCommand('copy')}
   $('ok').textContent='已复制 ✓';setTimeout(()=>$('ok').textContent='',1500)};
